@@ -31,28 +31,41 @@ exports.readListOfUrls = function(callback) {
     if (err) {
       throw err;
     }
-    var list = data.toString().split('\n');
-    console.log('READ LIST OF URLS: ', list);
+    var list;
+    if (data.toString() === '') {
+      list = [];
+    } else {
+      list = data.toString().split('\n');
+    }
+    // console.log('READ LIST OF URLS: ', list);
+    console.log("READFILE before cb");
     callback(list);
+    console.log("READFILE after cb");
   });
 };
 
 exports.isUrlInList = function(url, callback) {
   exports.readListOfUrls(function(urls) {
     var isInList = _.contains(urls, url);
+    console.log("isURLInList before cb: ", urls);
     callback(isInList);
+    console.log("isURLInList after cb: ", urls);
   });
 };
 
 exports.addUrlToList = function(url, callback) {
   exports.isUrlInList(url, function(exist) {
     if (!exist) {
-      exports.readListOfUrls(function(list) {
-        list.push(url);
-        fs.writeFile(exports.paths.list, list.join('\n'));
-        callback();
+      fs.appendFile(exports.paths.list, url + '\n', function(err) {
+        console.log("APPEND");
+        if (err) {
+          throw err;
+        }
       });
     }
+    console.log("addURL before cb");
+    callback();
+    console.log("addURL after cb");
   });
 };
 

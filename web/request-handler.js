@@ -31,7 +31,15 @@ exports.handleRequest = function (req, res) {
       }
     });
   } else if (req.method === 'POST') {
-    // console.log("POST url: ", Object.keys(req) );
-    archive.addUrlToList(req.url, function() {});
+
+    req.on('data', function(message) {
+      var url = message.toString().slice(4);
+      console.log("POST DATA: ", url);
+      archive.addUrlToList(url, function() {
+        res.statusCode = 302;
+        res.end(); 
+      });
+    });
+    
   }
 };
