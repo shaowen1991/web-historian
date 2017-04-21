@@ -28,28 +28,21 @@ exports.initialize = function(pathsObj) {
 
 exports.readListOfUrls = function(callback) {
   fs.readFile(exports.paths.list, function(err, data) {
-    if (err) {
-      throw err;
-    }
+    if (err) throw err;
     var list;
     if (data.toString() === '') {
       list = [];
     } else {
       list = data.toString().split('\n');
     }
-    // console.log('READ LIST OF URLS: ', list);
-    console.log("READFILE before cb");
     callback(list);
-    console.log("READFILE after cb");
   });
 };
 
 exports.isUrlInList = function(url, callback) {
   exports.readListOfUrls(function(urls) {
     var isInList = _.contains(urls, url);
-    console.log("isURLInList before cb: ", urls);
     callback(isInList);
-    console.log("isURLInList after cb: ", urls);
   });
 };
 
@@ -57,24 +50,16 @@ exports.addUrlToList = function(url, callback) {
   exports.isUrlInList(url, function(exist) {
     if (!exist) {
       fs.appendFile(exports.paths.list, url + '\n', function(err) {
-        console.log("APPEND");
-        if (err) {
-          throw err;
-        }
+        if (err) throw err;
+        callback();
       });
     }
-    console.log("addURL before cb");
-    callback();
-    console.log("addURL after cb");
   });
 };
 
 exports.isUrlArchived = function(url, callback) {
   fs.readdir(exports.paths.archivedSites, function(err, files) {
-    //files = ['fileA', 'fileB']
-    if (err) {
-      throw err;
-    }
+    if (err) throw err;
     var isInArch = _.contains(files, url);
     callback(isInArch);
   });
@@ -82,6 +67,7 @@ exports.isUrlArchived = function(url, callback) {
 
 exports.downloadUrls = function(urls) {
   _.each(urls, function(url) {
+    console.log("downloading...");
     var file = fs.createWriteStream(exports.paths.archivedSites + '/' + url);
     var request = http.get('http://' + url, function(response) {
       response.pipe(file);
